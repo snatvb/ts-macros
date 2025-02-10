@@ -12,7 +12,6 @@ import { cyan, emitError, emitNotification } from "./formatter"
 type CLIArgs = {
   _: string[]
 } & Omit<PretranspileSettings, "dist">
-
 ;(() => {
   const args = parseArgs(process.argv.slice(2)) as CLIArgs
   const command = args._[0]

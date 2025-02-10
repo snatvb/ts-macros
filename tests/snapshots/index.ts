@@ -21,7 +21,6 @@ const artifactsPath = path.join(process.cwd(), "../tests/snapshots/artifacts")
 const integrated = path.join(process.cwd(), "../tests/dist/integrated")
 
 if (!fs.existsSync(artifactsPath)) fs.mkdirSync(artifactsPath)
-
 ;(async () => {
   if (!NO_PROMPT && !(await askYesOrNo("Run snapshot tests? (y/n): ")))
     return process.exit()
