@@ -11,6 +11,7 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "curly": "warn"
+    "curly": "warn",
+    "no-extra-semi": 0
   }
 }

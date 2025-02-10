@@ -1,2 +1,5 @@
 docs/
 *.lock
+tests/snapshots/artifacts
+tests/integrated/
+dist/
