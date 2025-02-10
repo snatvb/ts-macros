@@ -41,11 +41,13 @@ export default {
           "`loadEnv` macro called but `dotenv` module is not installed.",
         )
       }
-      if (extraPath)
+      if (extraPath) {
         dotenv.config({
           path: path.join(ts.sys.getCurrentDirectory(), extraPath),
         })
-      else dotenv.config()
+      } else {
+        dotenv.config()
+      }
       transformer.props.optimizeEnv = true
       return transformer.context.factory.createCallExpression(
         transformer.context.factory.createPropertyAccessExpression(
@@ -73,16 +75,20 @@ export default {
   $$readFile: {
     call: ([file, parseJSON], transformer, callSite) => {
       const filePath = file && transformer.getStringFromNode(file, false, true)
-      if (!filePath)
+      if (!filePath) {
         throw new MacroError(
           callSite,
           "`readFile` macro expects a path to the JSON file as the first parameter.",
         )
+      }
       const shouldParse = parseJSON && transformer.getBoolFromNode(parseJSON)
       if (shouldParse) {
-        if (jsonFileCache[filePath]) return jsonFileCache[filePath]
-      } else if (regFileCache[filePath])
+        if (jsonFileCache[filePath]) {
+          return jsonFileCache[filePath]
+        }
+      } else if (regFileCache[filePath]) {
         return ts.factory.createStringLiteral(regFileCache[filePath])
+      }
       const fileContents = fs.readFileSync(filePath, "utf-8")
       if (shouldParse) {
         const value = primitiveToNode(JSON.parse(fileContents))
@@ -96,40 +102,46 @@ export default {
   },
   $$inline: {
     call: ([func, params, doNotCall], transformer, callSite) => {
-      if (!func)
+      if (!func) {
         throw new MacroError(
           callSite,
           "`inline` macro expects a function as the first argument.",
         )
-      if (!params || !ts.isArrayLiteralExpression(params))
+      }
+      if (!params || !ts.isArrayLiteralExpression(params)) {
         throw new MacroError(
           callSite,
           "`inline` macro expects an array of expressions as the second argument.",
         )
+      }
       const fn = normalizeFunctionNode(transformer.checker, func)
-      if (!fn || !fn.body)
+      if (!fn || !fn.body) {
         throw new MacroError(
           callSite,
           "`inline` macro expects a function as the first argument.",
         )
+      }
       let newBody: ts.ConciseBody
-      if (!fn.parameters.length) newBody = fn.body
-      else {
+      if (!fn.parameters.length) {
+        newBody = fn.body
+      } else {
         const replacements = new Map()
         for (let i = 0; i < fn.parameters.length; i++) {
           const param = fn.parameters[i]
-          if (ts.isIdentifier(param.name))
+          if (ts.isIdentifier(param.name)) {
             replacements.set(param.name.text, params.elements[i])
+          }
         }
         const visitor = (node: ts.Node): ts.Node | undefined => {
-          if (ts.isIdentifier(node) && replacements.has(node.text))
+          if (ts.isIdentifier(node) && replacements.has(node.text)) {
             return replacements.get(node.text)
+          }
           return ts.visitEachChild(node, visitor, transformer.context)
         }
         transformer.context.suspendLexicalEnvironment()
         newBody = ts.visitFunctionBody(fn.body, visitor, transformer.context)
       }
-      if (doNotCall)
+      if (doNotCall) {
         return ts.factory.createArrowFunction(
           undefined,
           undefined,
@@ -138,30 +150,35 @@ export default {
           undefined,
           newBody,
         )
-      else {
-        if (ts.isBlock(newBody)) return newBody.statements
-        else return newBody
+      } else {
+        if (ts.isBlock(newBody)) {
+          return newBody.statements
+        } else {
+          return newBody
+        }
       }
     },
   },
   $$kindof: {
     call: (args, transformer, callSite) => {
-      if (!args.length)
+      if (!args.length) {
         throw new MacroError(
           callSite,
           "`kindof` macro expects a single argument.",
         )
+      }
       return transformer.context.factory.createNumericLiteral(args[0].kind)
     },
   },
   $$define: {
     call: ([name, value, useLet, exportDecl], transformer, callSite) => {
       const strContent = transformer.getStringFromNode(name, true, true)
-      if (!strContent)
+      if (!strContent) {
         throw new MacroError(
           callSite,
           "`define` macro expects a string literal as the first argument.",
         )
+      }
       const list = transformer.context.factory.createVariableDeclarationList(
         [
           transformer.context.factory.createVariableDeclaration(
@@ -175,39 +192,46 @@ export default {
           ? ts.NodeFlags.Let
           : ts.NodeFlags.Const,
       )
-      if (ts.isForStatement(callSite.parent)) return list
-      else
+      if (ts.isForStatement(callSite.parent)) {
+        return list
+      } else {
         return ts.factory.createVariableStatement(
           transformer.getBoolFromNode(exportDecl)
             ? [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)]
             : undefined,
           list,
         )
+      }
     },
   },
   $$i: {
     call: (_, transformer) => {
-      if (transformer.repeat.length)
+      if (transformer.repeat.length) {
         return transformer.context.factory.createNumericLiteral(
           transformer.repeat[transformer.repeat.length - 1].index,
         )
-      else return createNumberNode(-1)
+      } else {
+        return createNumberNode(-1)
+      }
     },
   },
   $$length: {
     call: ([arrLit], transformer, callSite) => {
-      if (!arrLit)
+      if (!arrLit) {
         throw new MacroError(
           callSite,
           "`length` macro expects an array / string literal as the first argument.",
         )
-      if (ts.isArrayLiteralExpression(arrLit))
+      }
+      if (ts.isArrayLiteralExpression(arrLit)) {
         return transformer.context.factory.createNumericLiteral(
           arrLit.elements.length,
         )
+      }
       const str = transformer.getStringFromNode(arrLit, true, true)
-      if (str)
+      if (str) {
         return transformer.context.factory.createNumericLiteral(str.length)
+      }
       throw new MacroError(
         callSite,
         "`length` macro expects an array / string literal as the first argument.",
@@ -216,28 +240,32 @@ export default {
   },
   $$ident: {
     call: ([thing], transformer, callSite) => {
-      if (!thing)
+      if (!thing) {
         throw new MacroError(
           callSite,
           "`ident` macro expects a string literal as the first parameter.",
         )
+      }
       const strVal = transformer.getStringFromNode(thing, true, true)
-      if (strVal)
+      if (strVal) {
         return (
           transformer.getLastMacro()?.defined?.get(strVal) ||
           ts.factory.createIdentifier(strVal)
         )
-      else return thing
+      } else {
+        return thing
+      }
     },
   },
   $$err: {
     call: ([msg], transformer, callSite) => {
       const strVal = transformer.getStringFromNode(msg, false, true)
-      if (!strVal)
+      if (!strVal) {
         throw new MacroError(
           callSite,
           "`err` macro expects a string literal as the first argument.",
         )
+      }
       const lastMacro = transformer.macroStack.pop()
       throw new MacroError(
         callSite,
@@ -247,24 +275,27 @@ export default {
   },
   $$includes: {
     call: ([array, item], transformer, callSite) => {
-      if (!array)
+      if (!array) {
         throw new MacroError(
           callSite,
           "`includes` macro expects an array/string literal as the first argument.",
         )
-      if (!item)
+      }
+      if (!item) {
         throw new MacroError(
           callSite,
           "`includes` macro expects a second argument.",
         )
+      }
       const strContent = transformer.getStringFromNode(array, false, true)
       if (strContent) {
         const valItem = transformer.getLiteralFromNode(item)
-        if (typeof valItem !== "string")
+        if (typeof valItem !== "string") {
           throw new MacroError(
             callSite,
             "`includes` macro expects a string literal as the second argument.",
           )
+        }
         return strContent.includes(valItem)
           ? ts.factory.createTrue()
           : ts.factory.createFalse()
@@ -275,11 +306,12 @@ export default {
         return normalArr.includes(transformer.getLiteralFromNode(item))
           ? ts.factory.createTrue()
           : ts.factory.createFalse()
-      } else
+      } else {
         throw new MacroError(
           callSite,
           "`includes` macro expects an array/string literal as the first argument.",
         )
+      }
     },
   },
   $$ts: {
@@ -289,11 +321,12 @@ export default {
         true,
         true,
       )
-      if (!str)
+      if (!str) {
         throw new MacroError(
           callSite,
           "`ts` macro expects a string as it's first argument.",
         )
+      }
       const result = ts.createSourceFile(
         "expr",
         str,
@@ -313,20 +346,22 @@ export default {
   },
   $$escape: {
     call: ([code], transformer, callSite) => {
-      if (!code)
+      if (!code) {
         throw new MacroError(
           callSite,
           "`escape` macro expects a function as it's first argument.",
         )
+      }
       const maybeFn = normalizeFunctionNode(
         transformer.checker,
         transformer.expectExpression(code),
       )
-      if (!maybeFn || !maybeFn.body)
+      if (!maybeFn || !maybeFn.body) {
         throw new MacroError(
           callSite,
           "`escape` macro expects a function as it's first argument.",
         )
+      }
       if (ts.isBlock(maybeFn.body)) {
         const hygienicBody = [
           ...transformer.makeHygienic(
@@ -339,46 +374,52 @@ export default {
           if (ts.isReturnStatement(lastStatement)) {
             return lastStatement.expression
           } else {
-            if (!hygienicBody.length && ts.isExpression(lastStatement))
+            if (!hygienicBody.length && ts.isExpression(lastStatement)) {
               return lastStatement
+            }
             transformer.escapeStatement(lastStatement)
           }
         }
-      } else return maybeFn.body
+      } else {
+        return maybeFn.body
+      }
     },
   },
   $$slice: {
     call: ([thing, start, end], transformer, callSite) => {
-      if (!thing)
+      if (!thing) {
         throw new MacroError(
           callSite,
           "`slice` macro expects an array/string literal as the first argument.",
         )
+      }
       const startNum =
         (start && transformer.getNumberFromNode(start)) ?? -Infinity
       const endNum = (end && transformer.getNumberFromNode(end)) ?? Infinity
       const strVal = transformer.getStringFromNode(thing, false, true)
-      if (strVal)
+      if (strVal) {
         return ts.factory.createStringLiteral(strVal.slice(startNum, endNum))
-      else if (ts.isArrayLiteralExpression(thing))
+      } else if (ts.isArrayLiteralExpression(thing)) {
         return ts.factory.createArrayLiteralExpression(
           thing.elements.slice(startNum, endNum),
         )
-      else
+      } else {
         throw new MacroError(
           callSite,
           "`slice` macro expects an array/string literal as the first argument.",
         )
+      }
     },
   },
   $$propsOfType: {
     call: (_args, transformer, callSite) => {
       const type = transformer.resolveTypeArgumentOfCall(callSite, 0)
-      if (!type)
+      if (!type) {
         throw new MacroError(
           callSite,
           "`propsOfType` macro expects one type parameter.",
         )
+      }
       return ts.factory.createArrayLiteralExpression(
         type
           .getProperties()
@@ -389,15 +430,18 @@ export default {
   $$typeToString: {
     call: ([simplifyType, nonNullType, fullExpand], transformer, callSite) => {
       let type = transformer.resolveTypeArgumentOfCall(callSite, 0)
-      if (!type)
+      if (!type) {
         throw new MacroError(
           callSite,
           "`typeToString` macro expects one type parameter.",
         )
-      if (transformer.getBoolFromNode(simplifyType))
+      }
+      if (transformer.getBoolFromNode(simplifyType)) {
         type = getGeneralType(transformer.checker, type)
-      if (transformer.getBoolFromNode(nonNullType))
+      }
+      if (transformer.getBoolFromNode(nonNullType)) {
         type = transformer.checker.getNonNullableType(type)
+      }
       return ts.factory.createStringLiteral(
         transformer.checker.typeToString(
           type,
@@ -413,11 +457,12 @@ export default {
     call: (_args, transformer, callSite) => {
       const type = transformer.resolveTypeArgumentOfCall(callSite, 0)
       const compareTo = transformer.resolveTypeArgumentOfCall(callSite, 1)
-      if (!type || !compareTo)
+      if (!type || !compareTo) {
         throw new MacroError(
           callSite,
           "`typeAssignableTo` macro expects two type parameters.",
         )
+      }
       return transformer.checker.isTypeAssignableTo(type, compareTo)
         ? ts.factory.createTrue()
         : ts.factory.createFalse()
@@ -426,11 +471,12 @@ export default {
   $$typeMetadata: {
     call: ([collectProps, collectMethods], transformer, callSite) => {
       const type = transformer.resolveTypeArgumentOfCall(callSite, 0)
-      if (!type)
+      if (!type) {
         throw new MacroError(
           callSite,
           "`typeMetadata` macro expects a type parameter.",
         )
+      }
       const shouldCollectProps = transformer.getBoolFromNode(collectProps)
       const shouldCollectMethods = transformer.getBoolFromNode(collectMethods)
 
@@ -448,7 +494,9 @@ export default {
 
       for (const property of type.getProperties()) {
         const valueDecl = property.valueDeclaration
-        if (!valueDecl) continue
+        if (!valueDecl) {
+          continue
+        }
         const propType = transformer.checker.getTypeOfSymbolAtLocation(
           property,
           valueDecl,
@@ -563,17 +611,22 @@ export default {
   },
   $$text: {
     call: ([exp], transformer, callSite) => {
-      if (!exp)
+      if (!exp) {
         throw new MacroError(callSite, "`text` macro expects an expression.")
+      }
       return expressionToStringLiteral(exp)
     },
   },
   $$decompose: {
     call: ([exp], transformer) => {
-      if (!exp) return ts.factory.createArrayLiteralExpression([])
+      if (!exp) {
+        return ts.factory.createArrayLiteralExpression([])
+      }
       const elements: Array<ts.Expression> = []
       const visitor = (node: ts.Node) => {
-        if (ts.isExpression(node)) elements.push(node)
+        if (ts.isExpression(node)) {
+          elements.push(node)
+        }
         return node
       }
       ts.visitEachChild(exp, visitor, transformer.context)
@@ -583,32 +636,37 @@ export default {
   $$map: {
     call: ([exp, visitor], transformer, callSite) => {
       const lastMacro = transformer.getLastMacro()
-      if (!lastMacro)
+      if (!lastMacro) {
         throw new MacroError(
           callSite,
           "`$$map` macro can only be used inside other macros.",
         )
-      if (!exp)
+      }
+      if (!exp) {
         throw new MacroError(
           callSite,
           "`$$map` macro expects an expression as it's first argument.",
         )
-      if (!visitor)
+      }
+      if (!visitor) {
         throw new MacroError(
           callSite,
           "`$$map` macro expects a function expression as it's second argument.",
         )
+      }
       const fn = normalizeFunctionNode(transformer.checker, visitor)
-      if (!fn || !fn.body)
+      if (!fn || !fn.body) {
         throw new MacroError(
           callSite,
           "`$$map` macro expects a function as it's second argument.",
         )
-      if (!fn.parameters.length || !ts.isIdentifier(fn.parameters[0].name))
+      }
+      if (!fn.parameters.length || !ts.isIdentifier(fn.parameters[0].name)) {
         throw new MacroError(
           callSite,
           "`$$map` macro expects the function to have a parameter.",
         )
+      }
       const paramName = fn.parameters[0].name.text
       const kindParamName =
         fn.parameters[1] &&
@@ -616,21 +674,26 @@ export default {
         fn.parameters[1].name.text
       const visitorFn = (node: ts.Node): ts.Node | Array<ts.Node> => {
         const visitedNode = ts.visitNode(node, transformer.boundVisitor)
-        if (!visitedNode) return node
-        if (!ts.isExpression(visitedNode))
+        if (!visitedNode) {
+          return node
+        }
+        if (!ts.isExpression(visitedNode)) {
           return ts.visitEachChild(visitedNode, visitorFn, transformer.context)
+        }
         lastMacro.store.set(paramName, visitedNode)
-        if (kindParamName)
+        if (kindParamName) {
           lastMacro.store.set(
             kindParamName,
             ts.factory.createNumericLiteral(visitedNode.kind),
           )
+        }
         const newNodes = transformer.transformFunction(fn, true)
         if (
           newNodes.length === 1 &&
           newNodes[0].kind === ts.SyntaxKind.NullKeyword
-        )
+        ) {
           return ts.visitEachChild(visitedNode, visitorFn, transformer.context)
+        }
         return newNodes
       }
       return ts.visitNode(exp, visitorFn)
@@ -639,32 +702,41 @@ export default {
   },
   $$comptime: {
     call: ([fn], transformer, callSite) => {
-      if (transformer.config.noComptime) return
-      if (transformer.macroStack.length)
+      if (transformer.config.noComptime) {
+        return
+      }
+      if (transformer.macroStack.length) {
         throw new MacroError(
           callSite,
           "`comptime` macro cannot be called inside macros.",
         )
-      if (!fn)
+      }
+      if (!fn) {
         throw new MacroError(
           callSite,
           "`comptime` macro expects a function as the first parameter.",
         )
+      }
       const callableFn = normalizeFunctionNode(transformer.checker, fn)
-      if (!callableFn || !callableFn.body)
+      if (!callableFn || !callableFn.body) {
         throw new MacroError(
           callSite,
           "`comptime` macro expects a function as the first parameter.",
         )
+      }
       let parent = callSite.parent
       if (ts.isExpressionStatement(parent)) {
         parent = parent.parent
-        if (ts.isBlock(parent)) parent = parent.parent
+        if (ts.isBlock(parent)) {
+          parent = parent.parent
+        }
         if ("body" in parent) {
           const signature = transformer.checker.getSignatureFromDeclaration(
             parent as ts.SignatureDeclaration,
           )
-          if (!signature || !signature.declaration) return
+          if (!signature || !signature.declaration) {
+            return
+          }
           transformer.addComptimeSignature(
             signature.declaration,
             fnBodyToString(
@@ -682,31 +754,37 @@ export default {
   },
   $$raw: {
     call: ([fn], transformer, callSite) => {
-      if (transformer.config.noComptime) return
+      if (transformer.config.noComptime) {
+        return
+      }
       const lastMacro = transformer.getLastMacro()
-      if (!lastMacro)
+      if (!lastMacro) {
         throw new MacroError(
           callSite,
           "`raw` macro must be called inside another macro.",
         )
-      if (!fn)
+      }
+      if (!fn) {
         throw new MacroError(
           callSite,
           "`raw` macro expects a function as the first parameter.",
         )
+      }
       const callableFn = normalizeFunctionNode(transformer.checker, fn)
-      if (!callableFn || !callableFn.body)
+      if (!callableFn || !callableFn.body) {
         throw new MacroError(
           callSite,
           "`raw` macro expects a function as the first parameter.",
         )
+      }
       const renamedParameters = []
       for (const param of callableFn.parameters.slice(1)) {
-        if (!ts.isIdentifier(param.name))
+        if (!ts.isIdentifier(param.name)) {
           throw new MacroError(
             callSite,
             "`raw` macro parameters cannot be deconstructors.",
           )
+        }
         renamedParameters.push(param.name.text)
       }
       const stringified = transformer.addComptimeSignature(
