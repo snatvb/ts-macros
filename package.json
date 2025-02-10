@@ -4,22 +4,41 @@
   "description": "A typescript transformer / plugin which allows you to write macros for typescript!",
   "main": "dist/index.js",
   "bin": "dist/cli/index.js",
-  "dependencies": {
-    "yargs-parser": "^21.1.1"
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch src",
+    "lint": "npx eslint",
+    "format": "prettier . --write",
+    "test": "tsc && cd ./tests && tspc && mocha dist/integrated/**/*.js && node ./dist/snapshots/index",
+    "playground": "tsc && cd ./playground && npm run dev",
+    "manual": "tsc && cd ./test && tspc",
+    "prepublishOnly": "tsc"
   },
   "exports": {
-    ".": "./dist/index.js",
-    "./transformer": "./dist/transformer.js"
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./transformer": {
+      "require": "./dist/transformer.cjs",
+      "import": "./dist/transformer.js"
+    },
+    "./*": "./*"
   },
   "typesVersions": {
     "*": {
-      "index": [
-        "dist/index.d.ts"
-      ],
-      "transformer": [
-        "dist/transformer.d.ts"
+      "*": [
+        "./dist/*",
+        "./*"
       ]
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "yargs-parser": "^21.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
@@ -35,20 +54,11 @@
     "mocha": "^9.2.2",
     "prettier": "^3.5.0",
     "ts-patch": "^3.2.1",
+    "tsup": "^8.3.6",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {
     "typescript": "5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x"
-  },
-  "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "lint": "npx eslint",
-    "format": "prettier . --write",
-    "test": "tsc && cd ./tests && tspc && mocha dist/integrated/**/*.js && node ./dist/snapshots/index",
-    "playground": "tsc && cd ./playground && npm run dev",
-    "manual": "tsc && cd ./test && tspc",
-    "prepublishOnly": "tsc"
   },
   "repository": {
     "type": "git",
