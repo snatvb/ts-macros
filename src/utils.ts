@@ -22,18 +22,22 @@ export function hasBit(flags: number, bit: number): boolean {
 
 export function wrapExpressions(exprs: Array<ts.Statement>): ts.Expression {
   let last = exprs.pop()!
-  if (!last) return ts.factory.createNull()
-  if (exprs.length === 0 && ts.isReturnStatement(last))
+  if (!last) {
+    return ts.factory.createNull()
+  }
+  if (exprs.length === 0 && ts.isReturnStatement(last)) {
     return last.expression || ts.factory.createIdentifier("undefined")
-  if (ts.isExpressionStatement(last))
+  }
+  if (ts.isExpressionStatement(last)) {
     last = ts.factory.createReturnStatement(last.expression)
-  else if (
+  } else if (
     !(
       last.kind > ts.SyntaxKind.EmptyStatement &&
       last.kind < ts.SyntaxKind.DebuggerStatement
     )
-  )
+  ) {
     last = ts.factory.createReturnStatement(last as unknown as ts.Expression)
+  }
   return ts.factory.createImmediatelyInvokedArrowFunction([
     ...exprs,
     last as ts.Statement,
@@ -49,13 +53,15 @@ export function toBinaryExp(
   for (const element of body.map((m) =>
     ts.isExpressionStatement(m) ? m.expression : (m as ts.Expression),
   )) {
-    if (!last) last = element
-    else
+    if (!last) {
+      last = element
+    } else {
       last = transformer.context.factory.createBinaryExpression(
         last,
         id,
         element,
       )
+    }
   }
   return ts.visitNode(last, transformer.boundVisitor) as ts.Expression
 }
@@ -73,22 +79,30 @@ export function getRepetitionParams(
 ): RepetitionData {
   const res: Partial<RepetitionData> = { literals: [] }
   const firstElement = rep.elements[0]
-  if (ts.isStringLiteral(firstElement)) res.separator = firstElement.text
-  else if (ts.isArrayLiteralExpression(firstElement))
+  if (ts.isStringLiteral(firstElement)) {
+    res.separator = firstElement.text
+  } else if (ts.isArrayLiteralExpression(firstElement)) {
     res.literals!.push(...firstElement.elements)
-  else if (ts.isArrowFunction(firstElement)) res.fn = firstElement
+  } else if (ts.isArrowFunction(firstElement)) {
+    res.fn = firstElement
+  }
 
   const secondElement = rep.elements[1]
   if (secondElement) {
-    if (ts.isArrayLiteralExpression(secondElement))
+    if (ts.isArrayLiteralExpression(secondElement)) {
       res.literals!.push(...secondElement.elements)
-    else if (ts.isArrowFunction(secondElement)) res.fn = secondElement
+    } else if (ts.isArrowFunction(secondElement)) {
+      res.fn = secondElement
+    }
   }
 
   const thirdElement = rep.elements[2]
-  if (thirdElement && ts.isArrowFunction(thirdElement)) res.fn = thirdElement
-  if (!res.fn)
+  if (thirdElement && ts.isArrowFunction(thirdElement)) {
+    res.fn = thirdElement
+  }
+  if (!res.fn) {
     throw new MacroError(rep, "Repetition must include arrow function.")
+  }
 
   res.indexTypes = (res.fn.typeParameters || []).map((arg) =>
     checker.getTypeAtLocation(arg),
@@ -149,9 +163,11 @@ export function getNameFromProperty(obj: ts.PropertyName): string | undefined {
     ts.isStringLiteral(obj) ||
     ts.isPrivateIdentifier(obj) ||
     ts.isNumericLiteral(obj)
-  )
+  ) {
     return obj.text
-  else return undefined
+  } else {
+    return undefined
+  }
 }
 
 export function createObjectLiteral(
@@ -182,20 +198,21 @@ export function createObjectLiteral(
 }
 
 export function primitiveToNode(primitive: unknown): ts.Expression {
-  if (primitive === null) return ts.factory.createNull()
-  else if (primitive === undefined)
+  if (primitive === null) {
+    return ts.factory.createNull()
+  } else if (primitive === undefined) {
     return ts.factory.createIdentifier("undefined")
-  else if (typeof primitive === "string")
+  } else if (typeof primitive === "string") {
     return ts.factory.createStringLiteral(primitive)
-  else if (typeof primitive === "number")
+  } else if (typeof primitive === "number") {
     return ts.factory.createNumericLiteral(primitive)
-  else if (typeof primitive === "boolean")
+  } else if (typeof primitive === "boolean") {
     return primitive ? ts.factory.createTrue() : ts.factory.createFalse()
-  else if (Array.isArray(primitive))
+  } else if (Array.isArray(primitive)) {
     return ts.factory.createArrayLiteralExpression(
       primitive.map((p) => primitiveToNode(p)),
     )
-  else {
+  } else {
     const assignments: Array<ts.PropertyAssignment> = []
     for (const key in primitive as Record<string, unknown>) {
       assignments.push(
@@ -213,10 +230,14 @@ export function resolveAliasedSymbol(
   checker: ts.TypeChecker,
   sym?: ts.Symbol,
 ): ts.Symbol | undefined {
-  if (!sym) return
+  if (!sym) {
+    return
+  }
   while ((sym.flags & ts.SymbolFlags.Alias) !== 0) {
     const newSym = checker.getAliasedSymbol(sym)
-    if (newSym.name === "unknown") return sym
+    if (newSym.name === "unknown") {
+      return sym
+    }
     sym = newSym
   }
   return sym
@@ -227,7 +248,9 @@ export function fnBodyToString(
   fn: { body?: ts.ConciseBody | undefined },
   compilerOptions?: ts.CompilerOptions,
 ): string {
-  if (!fn.body) return ""
+  if (!fn.body) {
+    return ""
+  }
   const includedFns = new Set<string>()
   let code = ""
   const visitor = (node: ts.Node) => {
@@ -247,12 +270,16 @@ export function fnBodyToString(
           : ts.isIdentifier(node.expression)
             ? node.expression.text
             : undefined
-        if (!name || includedFns.has(name)) return
+        if (!name || includedFns.has(name)) {
+          return
+        }
         includedFns.add(name)
         code += `function ${name}(${signature.parameters.map((p) => p.name).join(",")}){${fnBodyToString(checker, signature.declaration, compilerOptions)}}`
       }
       ts.forEachChild(node, visitor)
-    } else ts.forEachChild(node, visitor)
+    } else {
+      ts.forEachChild(node, visitor)
+    }
   }
   ts.forEachChild(fn.body, visitor)
   return (
@@ -275,7 +302,9 @@ export function tryRun(
         contentStartNode,
         (additionalMessage || "") + err.message,
       )
-    } else throw err
+    } else {
+      throw err
+    }
   }
 }
 
@@ -285,10 +314,13 @@ export function macroParamsToArray<T>(
 ): Array<T | Array<T>> {
   const result = []
   for (let i = 0; i < params.length; i++) {
-    if (params[i].spread) result.push(values.slice(i))
-    else if (!values[i] && params[i].defaultVal)
+    if (params[i].spread) {
+      result.push(values.slice(i))
+    } else if (!values[i] && params[i].defaultVal) {
       result.push(params[i].defaultVal as T)
-    else result.push(values[i])
+    } else {
+      result.push(values[i])
+    }
   }
   return result
 }
@@ -314,9 +346,13 @@ export function resolveTypeWithTypeParams(
     const foundType = indexType.isTypeParameter()
       ? replacementTypes[typeParams.findIndex((t) => t === indexType)]
       : indexType
-    if (!foundType || !foundType.isLiteral()) return providedType
+    if (!foundType || !foundType.isLiteral()) {
+      return providedType
+    }
     const realType = objectType.getProperty(foundType.value.toString())
-    if (!realType) return providedType
+    if (!realType) {
+      return providedType
+    }
     return checker.getTypeOfSymbol(realType)
   }
   // Conditional type
@@ -346,8 +382,11 @@ export function resolveTypeWithTypeParams(
       typeParams,
       replacementTypes,
     )
-    if (checker.isTypeAssignableTo(checkType, extendsType)) return trueType
-    else return falseType
+    if (checker.isTypeAssignableTo(checkType, extendsType)) {
+      return trueType
+    } else {
+      return falseType
+    }
   } else if (providedType.isIntersection()) {
     const symTable = new Map()
     for (const unresolvedType of providedType.types) {
@@ -367,17 +406,19 @@ export function resolveTypeWithTypeParams(
       resolveTypeWithTypeParams(t, typeParams, replacementTypes),
     )
     return newType
-  } else if (providedType.isTypeParameter())
+  } else if (providedType.isTypeParameter()) {
     return (
       replacementTypes[typeParams.findIndex((t) => t === providedType)] ||
       providedType
     )
+  }
   //@ts-expect-error Private API
   else if (providedType.resolvedTypeArguments) {
     const newType = { ...providedType }
     //@ts-expect-error Private API
     newType.resolvedTypeArguments = providedType.resolvedTypeArguments.map(
-      (arg) => resolveTypeWithTypeParams(arg, typeParams, replacementTypes),
+      (arg: ts.Type) =>
+        resolveTypeWithTypeParams(arg, typeParams, replacementTypes),
     )
     return newType
   } else if (providedType.getCallSignatures().length) {
@@ -393,8 +434,9 @@ export function resolveTypeWithTypeParams(
       if (
         !p.valueDeclaration ||
         !(p.valueDeclaration as ts.ParameterDeclaration).type
-      )
+      ) {
         return p
+      }
       const newParam = checker.createSymbol(p.flags, p.escapedName)
       //@ts-expect-error Private API
       newParam.type = resolveTypeWithTypeParams(
@@ -418,7 +460,9 @@ export function resolveTypeArguments(
   call: ts.CallExpression,
 ): ts.Type[] {
   const sig = checker.getResolvedSignature(call)
-  if (!sig || !sig.mapper) return []
+  if (!sig || !sig.mapper) {
+    return []
+  }
   switch (sig.mapper.kind) {
     case ts.TypeMapKind.Simple:
       return [sig.mapper.target]
@@ -440,10 +484,14 @@ export function deExpandMacroResults(
 ): [Array<ts.Statement>, ts.Node?] {
   const cloned = [...nodes]
   const lastNode = cloned[nodes.length - 1]
-  if (!lastNode) return [nodes]
+  if (!lastNode) {
+    return [nodes]
+  }
   if (ts.isReturnStatement(lastNode)) {
     const expression = (cloned.pop() as ts.ReturnStatement).expression
-    if (!expression) return [nodes]
+    if (!expression) {
+      return [nodes]
+    }
     if (
       ts.isCallExpression(expression) &&
       ts.isParenthesizedExpression(expression.expression) &&
@@ -451,10 +499,13 @@ export function deExpandMacroResults(
     ) {
       const flattened = flattenBody(expression.expression.expression.body)
       let last: ts.Node | undefined = flattened.pop()
-      if (last && ts.isReturnStatement(last) && last.expression)
+      if (last && ts.isReturnStatement(last) && last.expression) {
         last = last.expression
+      }
       return [[...cloned, ...flattened], last]
-    } else return [cloned, expression]
+    } else {
+      return [cloned, expression]
+    }
   }
   return [cloned, cloned[cloned.length - 1]]
 }
@@ -467,33 +518,40 @@ export function normalizeFunctionNode(
     ts.isArrowFunction(fnNode) ||
     ts.isFunctionExpression(fnNode) ||
     ts.isFunctionDeclaration(fnNode)
-  )
+  ) {
     return fnNode
+  }
   const origin = checker.getSymbolAtLocation(fnNode)
   if (origin && origin.declarations?.length) {
     const originDecl = origin.declarations[0]
-    if (ts.isFunctionLikeDeclaration(originDecl)) return originDecl
-    else if (
+    if (ts.isFunctionLikeDeclaration(originDecl)) {
+      return originDecl
+    } else if (
       ts.isVariableDeclaration(originDecl) &&
       originDecl.initializer &&
       ts.isFunctionLikeDeclaration(originDecl.initializer)
-    )
+    ) {
       return originDecl.initializer
+    }
   }
 }
 
 export function expressionToStringLiteral(exp: ts.Expression): ts.Expression {
-  if (ts.isParenthesizedExpression(exp))
+  if (ts.isParenthesizedExpression(exp)) {
     return expressionToStringLiteral(exp.expression)
-  else if (ts.isStringLiteral(exp)) return exp
-  else if (ts.isIdentifier(exp)) return ts.factory.createStringLiteral(exp.text)
-  else if (ts.isNumericLiteral(exp))
+  } else if (ts.isStringLiteral(exp)) {
+    return exp
+  } else if (ts.isIdentifier(exp)) {
     return ts.factory.createStringLiteral(exp.text)
-  else if (exp.kind === ts.SyntaxKind.TrueKeyword)
+  } else if (ts.isNumericLiteral(exp)) {
+    return ts.factory.createStringLiteral(exp.text)
+  } else if (exp.kind === ts.SyntaxKind.TrueKeyword) {
     return ts.factory.createStringLiteral("true")
-  else if (exp.kind === ts.SyntaxKind.FalseKeyword)
+  } else if (exp.kind === ts.SyntaxKind.FalseKeyword) {
     return ts.factory.createStringLiteral("false")
-  else return ts.factory.createStringLiteral("null")
+  } else {
+    return ts.factory.createStringLiteral("null")
+  }
 }
 
 /**
@@ -505,11 +563,15 @@ export function getTypeAtLocation(
   node: ts.Node,
 ): ts.Type {
   if (node.pos === -1) {
-    if (ts.isStringLiteral(node)) return checker.getStringLiteralType(node.text)
-    else if (ts.isNumericLiteral(node))
+    if (ts.isStringLiteral(node)) {
+      return checker.getStringLiteralType(node.text)
+    } else if (ts.isNumericLiteral(node)) {
       return checker.getNumberLiteralType(+node.text)
-    else if (ts.isTemplateExpression(node)) return checker.getStringType()
-    else return checker.getTypeAtLocation(node)
+    } else if (ts.isTemplateExpression(node)) {
+      return checker.getStringType()
+    } else {
+      return checker.getTypeAtLocation(node)
+    }
   }
   return checker.getTypeAtLocation(node)
 }
@@ -518,20 +580,26 @@ export function getGeneralType(
   checker: ts.TypeChecker,
   type: ts.Type,
 ): ts.Type {
-  if (type.isStringLiteral()) return checker.getStringType()
-  else if (type.isNumberLiteral()) return checker.getNumberType()
-  else if (hasBit(type.flags, ts.TypeFlags.BooleanLiteral))
+  if (type.isStringLiteral()) {
+    return checker.getStringType()
+  } else if (type.isNumberLiteral()) {
+    return checker.getNumberType()
+  } else if (hasBit(type.flags, ts.TypeFlags.BooleanLiteral)) {
     return checker.getBooleanType()
-  else return type
+  } else {
+    return type
+  }
 }
 
 export function createNumberNode(num: number): ts.Expression {
-  if (num < 0)
+  if (num < 0) {
     return ts.factory.createPrefixUnaryExpression(
       ts.SyntaxKind.MinusToken,
       ts.factory.createNumericLiteral(Math.abs(num)),
     )
-  else return ts.factory.createNumericLiteral(num)
+  } else {
+    return ts.factory.createNumericLiteral(num)
+  }
 }
 
 export class MapArray<K, V> extends Map<K, V[]> {
@@ -541,13 +609,18 @@ export class MapArray<K, V> extends Map<K, V[]> {
 
   push(key: K, value: V): void {
     const arr = this.get(key)
-    if (!arr) this.set(key, [value])
-    else arr.push(value)
+    if (!arr) {
+      this.set(key, [value])
+    } else {
+      arr.push(value)
+    }
   }
 
   transferKey(oldKey: K, newKey: K): void {
     const returned = this.deleteAndReturn(oldKey)
-    if (!returned) return
+    if (!returned) {
+      return
+    }
     this.set(newKey, returned)
   }
 
@@ -560,13 +633,17 @@ export class MapArray<K, V> extends Map<K, V[]> {
   deleteEntry(toBeDeleted: V): void {
     for (const [, arr] of this) {
       const ind = arr.indexOf(toBeDeleted)
-      if (ind === -1) continue
+      if (ind === -1) {
+        continue
+      }
       arr.splice(ind, 1)
     }
   }
 
   clearArray(key: K): void {
     const arr = this.get(key)
-    if (arr) arr.length = 0
+    if (arr) {
+      arr.length = 0
+    }
   }
 }
