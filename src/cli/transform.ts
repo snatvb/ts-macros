@@ -3,8 +3,8 @@ import * as path from "path"
 import * as childProcess from "child_process"
 import * as fs from "fs"
 import { MacroTransformer } from "../transformer"
-import { TsMacrosConfig, macros } from ".."
-import { createMacroTransformerWatcher } from "../watcher"
+import { TsMacrosConfig, macros } from "../index.js"
+import { createMacroTransformerWatcher } from "../watcher/index.js"
 
 export interface PretranspileSettings {
   dist: string
@@ -34,8 +34,9 @@ export function createFile(
     0,
     providedPath.lastIndexOf(path.sep),
   )
-  if (!fs.existsSync(withoutFilename))
+  if (!fs.existsSync(withoutFilename)) {
     fs.mkdirSync(withoutFilename, { recursive: true })
+  }
   fs.writeFileSync(
     jsExtension ? providedPath.slice(0, -3) + ".js" : providedPath,
     content,
@@ -57,11 +58,14 @@ export function pretranspile(
   const config =
     settings.tsconfig ||
     ts.findConfigFile(process.cwd(), ts.sys.fileExists, "tsconfig.json")
-  if (!config)
+  if (!config) {
     return [createAnonDiagnostic("Couldn't find tsconfig.json file.")]
+  }
 
   const distPath = path.join(process.cwd(), settings.dist)
-  if (!fs.existsSync(distPath)) fs.mkdirSync(distPath, { recursive: true })
+  if (!fs.existsSync(distPath)) {
+    fs.mkdirSync(distPath, { recursive: true })
+  }
 
   const transformerConfig: TsMacrosConfig = {
     noComptime: settings.nocomptime,
@@ -101,9 +105,12 @@ export function pretranspile(
       ts.sys,
       () => undefined,
     )
-    if (!readConfig)
+    if (!readConfig) {
       return [createAnonDiagnostic("Couldn't read tsconfig.json file.")]
-    if (readConfig.errors.length) return readConfig.errors
+    }
+    if (readConfig.errors.length) {
+      return readConfig.errors
+    }
     const program = ts.createProgram({
       rootNames: readConfig.fileNames,
       options: readConfig.options,
@@ -115,7 +122,9 @@ export function pretranspile(
       transformerConfig,
     )
     for (const file of program.getSourceFiles()) {
-      if (file.isDeclarationFile) continue
+      if (file.isDeclarationFile) {
+        continue
+      }
       const transformed = transformFile(file, printer, transformer)
       createFile(
         path.join(
@@ -130,17 +139,22 @@ export function pretranspile(
       )
     }
 
-    if (settings.exec) childProcess.execSync(settings.exec)
-    if (settings.cleanup)
+    if (settings.exec) {
+      childProcess.execSync(settings.exec)
+    }
+    if (settings.cleanup) {
       fs.rmSync(settings.dist, { recursive: true, force: true })
+    }
   }
 }
 
 export function validateSettings(settings: Record<string, unknown>): string[] {
   const errors = []
-  if (settings.exec && typeof settings.exec !== "string")
+  if (settings.exec && typeof settings.exec !== "string") {
     errors.push("Expected exec to be a string")
-  if (settings.tsconfig && typeof settings.tsconfig !== "string")
+  }
+  if (settings.tsconfig && typeof settings.tsconfig !== "string") {
     errors.push("Expected tsconfig to be a string")
+  }
   return errors
 }

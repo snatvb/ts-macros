@@ -39,15 +39,16 @@ export function patchCompilerHost(
       onError,
       shouldCreateNewSourceFile,
     ) {
-      if (newSourceFiles.has(fileName))
+      if (newSourceFiles.has(fileName)) {
         return newSourceFiles.get(fileName) as ts.SourceFile
-      else
+      } else {
         return ogGetSourceFile(
           fileName,
           languageVersionOrOptions,
           onError,
           shouldCreateNewSourceFile,
         )
+      }
     },
   }
 }
@@ -64,7 +65,9 @@ export function extractGeneratedTypes(
   for (const statement of parsedSourceFile.statements) {
     if (statement.pos === -1) {
       const transformed = transformDeclaration(typeChecker, statement)
-      if (transformed) newNodes.push(transformed)
+      if (transformed) {
+        newNodes.push(transformed)
+      }
     }
   }
 
@@ -107,7 +110,9 @@ export default function (
 
   for (let i = 0; i < sourceFiles.length; i++) {
     const sourceFile = sourceFiles[i]
-    if (sourceFile.isDeclarationFile) continue
+    if (sourceFile.isDeclarationFile) {
+      continue
+    }
     let localDiagnostic: ts.Diagnostic | undefined
 
     let parsed
@@ -120,7 +125,7 @@ export default function (
         diagnostics.push(localDiagnostic)
       }
     }
-    if (isTSC)
+    if (isTSC) {
       newSourceFiles.set(
         sourceFile.fileName,
         instance.createSourceFile(
@@ -131,12 +136,14 @@ export default function (
           ts.ScriptKind.TS,
         ),
       )
-    else {
+    } else {
       const newNodes = []
       for (const statement of parsed.statements) {
         if (statement.pos === -1) {
           const transformed = transformDeclaration(typeChecker, statement)
-          if (transformed) newNodes.push(transformed)
+          if (transformed) {
+            newNodes.push(transformed)
+          }
         }
       }
 
@@ -152,15 +159,17 @@ export default function (
         true,
         ts.ScriptKind.TS,
       )
-      if (localDiagnostic)
+      if (localDiagnostic) {
         newNodesSource.parseDiagnostics.push(
           localDiagnostic as ts.DiagnosticWithLocation,
         )
-      if (options.logFileData)
+      }
+      if (options.logFileData) {
         ts.sys.writeFile(
           `${sourceFile.fileName}_log.txt`,
           `Generated at: ${new Date()}\nMacros: ${macros.size}\nNew node kinds: ${newNodes.map((n) => ts.SyntaxKind[n.kind]).join(", ")}\nFull source:\n\n${newNodesSource.text}`,
         )
+      }
       newSourceFiles.set(sourceFile.fileName, newNodesSource)
     }
   }

@@ -18,17 +18,19 @@ type CLIArgs = {
 
   if (command === "transform") {
     const dist = args._[1]
-    if (!dist || typeof dist !== "string")
+    if (!dist || typeof dist !== "string") {
       return emitError`Please provide an out folder path.\n\nUsage: ts-macros transform [PATH]`
+    }
     const validatedSettings = validateSettings(args)
-    if (validatedSettings.length)
+    if (validatedSettings.length) {
       return emitError`Setting errors:\n${validatedSettings.join(", ")}`
+    }
     const errors = pretranspile({
       dist,
       ...args,
     })
 
-    if (errors)
+    if (errors) {
       console.log(
         ts.formatDiagnosticsWithColorAndContext(errors, {
           getNewLine: () => "\r\n",
@@ -36,8 +38,10 @@ type CLIArgs = {
           getCanonicalFileName: (fileName) => fileName,
         }),
       )
-  } else if (command === "help") emitHelp()
-  else {
+    }
+  } else if (command === "help") {
+    emitHelp()
+  } else {
     emitNotification`Unknown command ${command}.`
     emitHelp()
   }
