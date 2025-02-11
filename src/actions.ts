@@ -50,10 +50,11 @@ export const binaryActions: Record<
     left: unknown,
     right: unknown,
   ) => {
-    if (typeof left === "string" || typeof right === "string")
+    if (typeof left === "string" || typeof right === "string") {
       return ts.factory.createStringLiteral((left as string) + right)
-    else if (typeof left === "number" || typeof right === "number")
+    } else if (typeof left === "number" || typeof right === "number") {
       return createNumberNode((left as number) + (right as number))
+    }
   },
   [ts.SyntaxKind.EqualsEqualsEqualsToken]: (
     _origLeft: ts.Expression,
@@ -85,9 +86,15 @@ export const binaryActions: Record<
     left: unknown,
     right: unknown,
   ) => {
-    if (left && right) return origRight
-    if (!left) return origLeft
-    if (!right) return origRight
+    if (left && right) {
+      return origRight
+    }
+    if (!left) {
+      return origLeft
+    }
+    if (!right) {
+      return origRight
+    }
   },
   [ts.SyntaxKind.BarBarToken]: (
     origLeft: ts.Expression,
@@ -95,9 +102,13 @@ export const binaryActions: Record<
     left: unknown,
     right: unknown,
   ) => {
-    if (left) return origLeft
-    else if (right) return origRight
-    else return origRight
+    if (left) {
+      return origLeft
+    } else if (right) {
+      return origRight
+    } else {
+      return origRight
+    }
   },
 }
 
@@ -116,8 +127,11 @@ export const possiblyUnknownValueBinaryActions: Record<
     left: unknown,
   ) => {
     if (left !== NO_LIT_FOUND) {
-      if (left) return origRight
-      else return origLeft
+      if (left) {
+        return origRight
+      } else {
+        return origLeft
+      }
     }
   },
   [ts.SyntaxKind.BarBarToken]: (
@@ -126,8 +140,11 @@ export const possiblyUnknownValueBinaryActions: Record<
     left: unknown,
   ) => {
     if (left !== NO_LIT_FOUND) {
-      if (left) return origLeft
-      else return origRight
+      if (left) {
+        return origLeft
+      } else {
+        return origRight
+      }
     }
   },
 }
@@ -139,15 +156,21 @@ export const unaryActions: Record<
   [ts.SyntaxKind.ExclamationToken]: (val: unknown) =>
     !val ? ts.factory.createTrue() : ts.factory.createFalse(),
   [ts.SyntaxKind.MinusToken]: (val: unknown) => {
-    if (typeof val !== "number") return
+    if (typeof val !== "number") {
+      return
+    }
     return createNumberNode(-val)
   },
   [ts.SyntaxKind.TildeToken]: (val: unknown) => {
-    if (typeof val !== "number") return
+    if (typeof val !== "number") {
+      return
+    }
     return createNumberNode(~val)
   },
   [ts.SyntaxKind.PlusToken]: (val: unknown) => {
-    if (typeof val !== "number" && typeof val !== "string") return
+    if (typeof val !== "number" && typeof val !== "string") {
+      return
+    }
     return createNumberNode(+val)
   },
 }
@@ -166,8 +189,9 @@ export const labelActions: Record<number, (statement: any) => ts.Expression> = {
     let initializer
     if (ts.isVariableDeclarationList(node.initializer)) {
       const firstDecl = node.initializer.declarations[0]
-      if (firstDecl && ts.isIdentifier(firstDecl.name))
+      if (firstDecl && ts.isIdentifier(firstDecl.name)) {
         initializer = firstDecl.name
+      }
     } else {
       initializer = node.initializer
     }
@@ -183,8 +207,9 @@ export const labelActions: Record<number, (statement: any) => ts.Expression> = {
     let initializer
     if (ts.isVariableDeclarationList(node.initializer)) {
       const firstDecl = node.initializer.declarations[0]
-      if (firstDecl && ts.isIdentifier(firstDecl.name))
+      if (firstDecl && ts.isIdentifier(firstDecl.name)) {
         initializer = firstDecl.name
+      }
     } else {
       initializer = node.initializer
     }
@@ -219,15 +244,18 @@ export const labelActions: Record<number, (statement: any) => ts.Expression> = {
       if (ts.isVariableDeclarationList(node.initializer)) {
         variables = []
         for (const decl of node.initializer.declarations) {
-          if (ts.isIdentifier(decl.name))
+          if (ts.isIdentifier(decl.name)) {
             variables.push(
               ts.factory.createArrayLiteralExpression([
                 ts.factory.createIdentifier(decl.name.text),
                 decl.initializer || ts.factory.createIdentifier("undefined"),
               ]),
             )
+          }
         }
-      } else expression = node.initializer
+      } else {
+        expression = node.initializer
+      }
     }
     return createObjectLiteral({
       kind: ts.factory.createNumericLiteral(LabelKinds.For),
@@ -251,7 +279,9 @@ export const labelActions: Record<number, (statement: any) => ts.Expression> = {
     const idents: Array<ts.Identifier> = [],
       inits: Array<ts.Expression> = []
     for (const decl of node.declarationList.declarations) {
-      if (!ts.isIdentifier(decl.name)) continue
+      if (!ts.isIdentifier(decl.name)) {
+        continue
+      }
       idents.push(decl.name)
       inits.push(decl.initializer || ts.factory.createIdentifier("undefined"))
     }
