@@ -24,6 +24,7 @@ All macro names must start with a dollar sign (`$`) and must be declared using t
 ### Bundlers
 
 Vite, Webpack(NextJS), Rspack, Esbuild, Nuxt, Rollup
+
 Read here: [`unplugin`](./unplugin)
 
 ### Other

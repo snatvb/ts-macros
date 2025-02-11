@@ -5,13 +5,13 @@
   "packageManager": "pnpm@9.9.0",
   "desmecription": "",
   "license": "MIT",
-  "homepage": "https://github.com/snatvb/ts-patch#readme",
+  "homepage": "https://github.com/snatvb/ts-macros#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/snatvb/ts-patch.git"
+    "url": "git+https://github.com/snatvb/ts-macros.git"
   },
   "bugs": {
-    "url": "https://github.com/snatvb/ts-patch/issues"
+    "url": "https://github.com/snatvb/ts-macros/issues"
   },
   "author": "Andrew <snatlip48@gmail.com>",
   "keywords": [

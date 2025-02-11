@@ -1,5 +1,5 @@
 {
-  "name": "ts-macros",
+  "name": "@snatvb/ts-macros",
   "version": "2.6.3",
   "description": "A typescript transformer / plugin which allows you to write macros for typescript!",
   "main": "dist/index.js",
@@ -62,16 +62,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GoogleFeud/ts-macros.git"
+    "url": "git+https://github.com/snatvb/ts-macros.git"
   },
   "keywords": [
     "typescript",
     "macros"
   ],
-  "author": "GoogleFeud",
+  "author": "snatvb & GoogleFeud",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GoogleFeud/ts-macros/issues"
+    "url": "https://github.com/snatvb/ts-macros/issues"
   },
   "homepage": "https://googlefeud.github.io/ts-macros/"
 }
