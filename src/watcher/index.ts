@@ -27,9 +27,11 @@ export function transpileFile(
     const transformed = transformer.run(sourceFile)
     return printer.printFile(transformed)
   } catch (err) {
-    if (err instanceof MacroError)
+    if (err instanceof MacroError) {
       return genDiagnosticFromMacroError(sourceFile, err)
-    else throw err
+    } else {
+      throw err
+    }
   }
 }
 
@@ -67,7 +69,9 @@ export function createMacroTransformerWatcher(
           macrosCreatedInFile.push(macro.node.getSourceFile().fileName, macro)
         },
         beforeCallMacro(_transformer, macro, expand) {
-          if (!expand.call) return
+          if (!expand.call) {
+            return
+          }
           macrosReferencedInFiles.push(
             macro,
             expand.call.getSourceFile().fileName,
@@ -81,11 +85,15 @@ export function createMacroTransformerWatcher(
     ),
     getFilesThatNeedChanges = (origin: string): string[] => {
       const ownedMacros = macrosCreatedInFile.get(origin)
-      if (!ownedMacros) return []
-      const files = []
+      if (!ownedMacros) {
+        return []
+      }
+      const files: string[] = []
       for (const macro of ownedMacros) {
         const macroIsReferencedIn = macrosReferencedInFiles.get(macro)
-        if (!macroIsReferencedIn) continue
+        if (!macroIsReferencedIn) {
+          continue
+        }
         files.push(...macroIsReferencedIn)
       }
       return files
@@ -105,7 +113,9 @@ export function createMacroTransformerWatcher(
     const forcedFilesToGetTranspiled: string[] = []
 
     for (const source of newProgram.getProgram().getSourceFiles()) {
-      if (source.isDeclarationFile) continue
+      if (source.isDeclarationFile) {
+        continue
+      }
       //@ts-expect-error Bypass
       newProgram.getSemanticDiagnostics(source).length = 0
       const oldSource = oldProgram?.getSourceFile(source.fileName)
@@ -128,7 +138,9 @@ export function createMacroTransformerWatcher(
               : FileUpdateCause.ContentChange,
             jsOut,
           )
-        } else errors.push(transpiled)
+        } else {
+          errors.push(transpiled)
+        }
       }
     }
     actions.afterUpdate?.(!!oldProgram)

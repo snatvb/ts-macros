@@ -777,7 +777,7 @@ export default {
           "`raw` macro expects a function as the first parameter.",
         )
       }
-      const renamedParameters = []
+      const renamedParameters: string[] = []
       for (const param of callableFn.parameters.slice(1)) {
         if (!ts.isIdentifier(param.name)) {
           throw new MacroError(

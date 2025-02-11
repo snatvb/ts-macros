@@ -24,10 +24,18 @@
       "require": "./dist/transformer.cjs",
       "import": "./dist/transformer.js"
     },
-    "./*": "./*"
+    "./res": {
+      "require": "./dist/type-resolve/index.cjs",
+      "import": "./dist/type-resolve/index.js"
+    },
+    "./*": "./dist/*"
   },
   "typesVersions": {
     "*": {
+      "type-resolve": [
+        "./dist/type-resolve/index.d.cts",
+        "./dist/type-resolve/index.d.ts"
+      ],
       "*": [
         "./dist/*",
         "./*"

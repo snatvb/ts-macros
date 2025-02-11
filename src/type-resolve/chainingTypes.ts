@@ -1,4 +1,4 @@
-import ts = require("typescript")
+import * as ts from "typescript"
 import { Macro } from "../transformer"
 import { MapArray, hasBit } from "../utils"
 import { UNKNOWN_TOKEN } from "./declarations"

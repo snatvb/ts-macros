@@ -1,7 +1,7 @@
-import * as ts from "typescript"
-import { macros, MacroError } from "../../dist"
-import { extractGeneratedTypes } from "../../dist/type-resolve"
-import { MacroTransformer } from "../../dist/transformer"
+import ts from "typescript"
+import { macros, MacroError } from "@snatvb/ts-macros"
+import { extractGeneratedTypes } from "@snatvb/ts-macros/type-resolve"
+import { MacroTransformer } from "@snatvb/ts-macros/transformer"
 
 export let Markers = `
 declare function $$loadEnv(path?: string) : void;

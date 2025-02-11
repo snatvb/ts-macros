@@ -149,7 +149,7 @@ export function pretranspile(
 }
 
 export function validateSettings(settings: Record<string, unknown>): string[] {
-  const errors = []
+  const errors: string[] = []
   if (settings.exec && typeof settings.exec !== "string") {
     errors.push("Expected exec to be a string")
   }
