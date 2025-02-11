@@ -1,4 +1,4 @@
-import { $$escape, Save } from "ts-macros"
+import { $$escape, Save } from "@snatvb/ts-macros"
 import { $map } from "./map"
 type Result<T, E> = ({ ok: T } | { err: E }) & {
   $unwrap?(): T

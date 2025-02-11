@@ -27,6 +27,9 @@ importers:
       '@nuxt/schema':
         specifier: ^3.13.0
         version: 3.13.0(rollup@4.21.2)
+      '@snatvb/ts-macros':
+        specifier: 2.6.3
+        version: 2.6.3(typescript@5.5.4)
       '@types/node':
         specifier: ^22.5.1
         version: 22.5.1
@@ -51,9 +54,6 @@ importers:
       rollup:
         specifier: ^4.21.2
         version: 4.21.2
-      ts-macros:
-        specifier: file:../
-        version: file:..(typescript@5.5.4)
       tsup:
         specifier: ^8.2.4
         version: 8.2.4(jiti@1.21.6)(postcss@8.4.41)(tsx@4.19.0)(typescript@5.5.4)
@@ -72,7 +72,7 @@ importers:
 
   playground:
     devDependencies:
-      ts-macros:
+      '@snatvb/ts-macros':
         specifier: file:../../
         version: file:..(typescript@5.5.4)
       vite:
@@ -858,6 +858,18 @@ packages:
   '@sindresorhus/merge-streams@2.3.0':
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
+
+  '@snatvb/ts-macros@2.6.3':
+    resolution: {integrity: sha512-PN3Dp32r9IOTc7X+GOqiV59gx67HfC+9WukXjDtRXHX7YX4/rqmTMEZ9ETBdf+66cCzEfXOSLWuPE7HRB+UQeA==}
+    hasBin: true
+    peerDependencies:
+      typescript: 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
+
+  '@snatvb/ts-macros@file:..':
+    resolution: {directory: .., type: directory}
+    hasBin: true
+    peerDependencies:
+      typescript: 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
 
   '@stylistic/eslint-plugin@2.7.1':
     resolution: {integrity: sha512-JqnHom8CP14oOgPhwTPbn0QgsBJwgNySQSe00V9GQQDlY1tEqZUlK4jM2DIOJ5nE+oXoy51vZWHnHkfZ6rEruw==}
@@ -3174,12 +3186,6 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  ts-macros@file:..:
-    resolution: {directory: .., type: directory}
-    hasBin: true
-    peerDependencies:
-      typescript: 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x
-
   tslib@2.7.0:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
@@ -4315,6 +4321,16 @@ snapshots:
     optional: true
 
   '@sindresorhus/merge-streams@2.3.0': {}
+
+  '@snatvb/ts-macros@2.6.3(typescript@5.5.4)':
+    dependencies:
+      typescript: 5.5.4
+      yargs-parser: 21.1.1
+
+  '@snatvb/ts-macros@file:..(typescript@5.5.4)':
+    dependencies:
+      typescript: 5.5.4
+      yargs-parser: 21.1.1
 
   '@stylistic/eslint-plugin@2.7.1(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)':
     dependencies:
@@ -6716,11 +6732,6 @@ snapshots:
       typescript: 5.5.4
 
   ts-interface-checker@0.1.13: {}
-
-  ts-macros@file:..(typescript@5.5.4):
-    dependencies:
-      typescript: 5.5.4
-      yargs-parser: 21.1.1
 
   tslib@2.7.0: {}
 

@@ -1,19 +1,24 @@
 import type { UnpluginFactory } from "unplugin"
 import { createUnplugin } from "unplugin"
-import { Macro, MacroTransformer } from "ts-macros/transformer"
+import { Macro, MacroTransformer } from "@snatvb/ts-macros/transformer"
 import type { Options } from "./types"
 import ts from "typescript"
-import { TsMacrosConfig } from "ts-macros/index"
+import { TsMacrosConfig } from "@snatvb/ts-macros"
+
+const transformerConfig: TsMacrosConfig = {
+  noComptime: false,
+  keepImports: true,
+}
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
-  options = {},
+  userOptions = {},
 ) => {
+  const options = {
+    ...transformerConfig,
+    ...userOptions,
+  }
   const macros = new Map<ts.Symbol, Macro>()
 
-  const transformerConfig: TsMacrosConfig = {
-    noComptime: false,
-    keepImports: true,
-  }
   const config =
     options.tsconfig ||
     ts.findConfigFile(process.cwd(), ts.sys.fileExists, "tsconfig.json")
