@@ -26,6 +26,8 @@ All macro names must start with a dollar sign (`$`) and must be declared using t
 Vite, Webpack(NextJS), Rspack, Esbuild, Nuxt, Rollup
 Read here: [`unplugin`](./unplugin)
 
+### Other
+
 ```
 npm i --save-dev ts-macros
 ```
