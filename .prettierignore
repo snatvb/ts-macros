@@ -1,1 +1,6 @@
-**
+docs/
+*.lock
+*lock.yaml
+tests/snapshots/artifacts
+tests/integrated/
+dist/

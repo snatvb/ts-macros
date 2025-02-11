@@ -1,8 +1,7 @@
-
-import * as ts from "typescript";
-import { macros, MacroError } from "../../dist";
-import { extractGeneratedTypes } from "../../dist/type-resolve";
-import { MacroTransformer } from "../../dist/transformer";
+import * as ts from "typescript"
+import { macros, MacroError } from "../../dist"
+import { extractGeneratedTypes } from "../../dist/type-resolve"
+import { MacroTransformer } from "../../dist/transformer"
 
 export let Markers = `
 declare function $$loadEnv(path?: string) : void;
@@ -100,78 +99,99 @@ interface BlockLabel {
     statement: any
 }
 type Label = IfLabel | ForIterLabel | ForLabel | WhileLabel | BlockLabel;
-`;
+`
 
-Markers += "const enum SyntaxKind {\n";
+Markers += "const enum SyntaxKind {\n"
 for (const kind in Object.keys(ts.SyntaxKind)) {
-    if (ts.SyntaxKind[kind]) Markers += `${ts.SyntaxKind[kind]} = ${kind},\n`;
+  if (ts.SyntaxKind[kind]) Markers += `${ts.SyntaxKind[kind]} = ${kind},\n`
 }
-Markers += "\n}\n";
+Markers += "\n}\n"
 
 export const CompilerOptions: ts.CompilerOptions = {
-    //...ts.getDefaultCompilerOptions(),                    
-    noImplicitAny: true,
-    strictNullChecks: true,
-    target: ts.ScriptTarget.ESNext,
-    experimentalDecorators: true,
-    lib: ["ES5"]
-};
-
-export interface GeneratedTypes {
-    fromMacros: string,
-    chainTypes: string
+  //...ts.getDefaultCompilerOptions(),
+  noImplicitAny: true,
+  strictNullChecks: true,
+  target: ts.ScriptTarget.ESNext,
+  experimentalDecorators: true,
+  lib: ["ES5"],
 }
 
-export function transpile(str: string) : {
-    generatedTypes: GeneratedTypes,
-    errors: MacroError[],
-    transpiledSourceCode?: string
+export interface GeneratedTypes {
+  fromMacros: string
+  chainTypes: string
+}
+
+export function transpile(str: string): {
+  generatedTypes: GeneratedTypes
+  errors: MacroError[]
+  transpiledSourceCode?: string
 } {
-    macros.clear();
+  macros.clear()
 
-    const sourceFile = ts.createSourceFile("module.ts", Markers + str, CompilerOptions.target || ts.ScriptTarget.ESNext, true);
-    const errors = [];
+  const sourceFile = ts.createSourceFile(
+    "module.ts",
+    Markers + str,
+    CompilerOptions.target || ts.ScriptTarget.ESNext,
+    true,
+  )
+  const errors = []
 
-    const CompilerHost: ts.CompilerHost = {
-        getSourceFile: (fileName) => {
-            if (fileName === "module.ts") return sourceFile;
-        },
-        getDefaultLibFileName: () => "lib.d.ts",
-        useCaseSensitiveFileNames: () => false,
-        getCanonicalFileName: fileName => fileName,
-        writeFile: () => {},
-        getCurrentDirectory: () => "",
-        getNewLine: () => "\n",
-        fileExists: () => true,
-        readFile: () => "",
-        directoryExists: () => true,
-        getDirectories: () => []
-    };
+  const CompilerHost: ts.CompilerHost = {
+    getSourceFile: (fileName) => {
+      if (fileName === "module.ts") return sourceFile
+    },
+    getDefaultLibFileName: () => "lib.d.ts",
+    useCaseSensitiveFileNames: () => false,
+    getCanonicalFileName: (fileName) => fileName,
+    writeFile: () => {},
+    getCurrentDirectory: () => "",
+    getNewLine: () => "\n",
+    fileExists: () => true,
+    readFile: () => "",
+    directoryExists: () => true,
+    getDirectories: () => [],
+  }
 
-    const program = ts.createProgram(["module.ts"], CompilerOptions, CompilerHost);
+  const program = ts.createProgram(["module.ts"], CompilerOptions, CompilerHost)
 
-    let genResult: ReturnType<typeof extractGeneratedTypes> | undefined, transpiledSourceCode;
-    try {
-        program.emit(undefined, (_, text) => transpiledSourceCode = text, undefined, undefined, {
-            before: [(ctx: ts.TransformationContext) => {
-                const transformer = new MacroTransformer(ctx, program.getTypeChecker(), macros);
-                return (node: ts.SourceFile) => {
-                    const modified = transformer.run(node);
-                    genResult = extractGeneratedTypes(program.getTypeChecker(), modified);
-                    return modified;
-                }
-            }]
-        });
-    } catch (err: unknown) {
-        if (err instanceof MacroError) errors.push(err);
-    }
+  let genResult: ReturnType<typeof extractGeneratedTypes> | undefined,
+    transpiledSourceCode
+  try {
+    program.emit(
+      undefined,
+      (_, text) => (transpiledSourceCode = text),
+      undefined,
+      undefined,
+      {
+        before: [
+          (ctx: ts.TransformationContext) => {
+            const transformer = new MacroTransformer(
+              ctx,
+              program.getTypeChecker(),
+              macros,
+            )
+            return (node: ts.SourceFile) => {
+              const modified = transformer.run(node)
+              genResult = extractGeneratedTypes(
+                program.getTypeChecker(),
+                modified,
+              )
+              return modified
+            }
+          },
+        ],
+      },
+    )
+  } catch (err: unknown) {
+    if (err instanceof MacroError) errors.push(err)
+  }
 
-    return {
-        transpiledSourceCode,
-        generatedTypes: {
-            fromMacros: genResult ? genResult.print(genResult.typeNodes) : "",
-            chainTypes: genResult ? genResult.print(genResult.chainTypes) : ""
-        },
-        errors
-    }
+  return {
+    transpiledSourceCode,
+    generatedTypes: {
+      fromMacros: genResult ? genResult.print(genResult.typeNodes) : "",
+      chainTypes: genResult ? genResult.print(genResult.chainTypes) : "",
+    },
+    errors,
+  }
 }

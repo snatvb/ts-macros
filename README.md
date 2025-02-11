@@ -1,6 +1,6 @@
 # ts-macros
 
-ts-macros is a typescript transformer which allows you to create function macros that expand to javascript code during the transpilation phase of your program. 
+ts-macros is a typescript transformer which allows you to create function macros that expand to javascript code during the transpilation phase of your program.
 
 📖 **[Documentation](https://github.com/GoogleFeud/ts-macros/wiki)**
 🎮 **[Playground](https://googlefeud.github.io/ts-macros/)**
@@ -13,12 +13,21 @@ All macro names must start with a dollar sign (`$`) and must be declared using t
 ![showcase](https://github.com/GoogleFeud/ts-macros/blob/dev/.github/assets/intro_gif.gif)
 
 **What you can do with ts-macros**:
+
 - Generate repetitive code
 - Generate code conditionally, based on enviourment variables or other configuration files
 - Generate types which you can use in your code (read more [here](https://github.com/GoogleFeud/ts-macros/wiki/Type-Resolver-Transformer))
 - Create abstractions without the runtime cost
 
 ## Usage
+
+### Bundlers
+
+Vite, Webpack(NextJS), Rspack, Esbuild, Nuxt, Rollup
+
+Read here: [`unplugin`](./unplugin)
+
+### Other
 
 ```
 npm i --save-dev ts-macros
@@ -43,22 +52,25 @@ and add the ts-macros transformer to your tsconfig.json:
 ```
 
 Afterwards you can either:
+
 - Transpile your code using the `tspc` command that ts-patch provides.
 - Patch the instance of typescript that's in your `node_modules` folder with the `ts-patch install` command and then use the `tsc` command to transpile your code.
+
 </details>
 
 <details>
     <summary>Usage with ts-loader</summary>
 
 ```js
-const TsMacros = require("ts-macros").default;
+const TsMacros = require("ts-macros").default
 
 options: {
-      getCustomTransformers: program => {
-        before: [TsMacros(program)]
-      }
+  getCustomTransformers: (program) => {
+    before: [TsMacros(program)]
+  }
 }
 ```
+
 </details>
 
 <details>
@@ -80,17 +92,6 @@ npm i --save-dev ts-node
     ]
   }
 ```
-</details>
-
-<details>
-    <summary>CLI Usage (esbuild, vite, watchers)</summary>
-
-If you want to use ts-macros with:
-- tools that don't support typescript
-- tools that aren't written in javascript and therefore cannot run typescript transformers (tools that use swc, for example)
-- any tools' watch mode (webpack, vite, esbuild, etc)
-
-you can use the CLI - [read more about the CLI and example here](https://github.com/GoogleFeud/ts-macros/wiki/CLI-usage)
 
 </details>
 
@@ -101,6 +102,7 @@ This library has 2 built-in macros (`$raw` and `$comptime`) which execute arbitr
 If you're transpiling an untrusted codebase which uses this library, make sure to set the `noComptime` option to `true`. Enabling it will replace all calls to these macros with `null` without executing the code inside them. It's always best to review all call sites to `$$raw` and `$$comptime` yourself before transpiling any untrusted codebases.
 
 **ttypescript/ts-patch:**
+
 ```json
 "plugins": [
         { "transform": "ts-macros", "noComptime": true }
@@ -108,10 +110,15 @@ If you're transpiling an untrusted codebase which uses this library, make sure t
 ```
 
 **manually creating the factory:**
+
 ```js
-TsMacros(program, { noComptime: true });
+TsMacros(program, { noComptime: true })
 ```
 
 ## Contributing
 
-`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at https://github.com/GoogleFeud/ts-macros.
+`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at <https://github.com/snatvb/ts-macros>.
+
+# Thanks
+
+This project is a fork of [ts-macros](https://github.com/GoogleFeud/ts-macros) by GoogleFeud. Thank you for the amazing foundation! 🚀
