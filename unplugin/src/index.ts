@@ -5,15 +5,6 @@ import type { Options } from "./types"
 import ts from "typescript"
 import { TsMacrosConfig } from "ts-macros/index"
 
-export function createAnonDiagnostic(message: string): ts.Diagnostic {
-  return ts.createCompilerDiagnostic({
-    key: "Errror",
-    code: 8000,
-    message,
-    category: ts.DiagnosticCategory.Error,
-  })
-}
-
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (
   options = {},
 ) => {
@@ -55,8 +46,10 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (
     transformInclude(id) {
       return id.endsWith(".ts") || id.endsWith(".tsx")
     },
-    watchChange() {
-      macros.clear()
+    load(id) {
+      if (id.endsWith(".ts") || id.endsWith(".tsx")) {
+        macros.clear()
+      }
     },
     transform(code, id) {
       compilerHost.readFile = (fileName: string) => {
