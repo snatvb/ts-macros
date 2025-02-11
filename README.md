@@ -21,6 +21,11 @@ All macro names must start with a dollar sign (`$`) and must be declared using t
 
 ## Usage
 
+### Bundlers
+
+Vite, Webpack(NextJS), Rspack, Esbuild, Nuxt, Rollup
+Read here: [`unplugin`](./unplugin)
+
 ```
 npm i --save-dev ts-macros
 ```
@@ -47,6 +52,7 @@ Afterwards you can either:
 
 - Transpile your code using the `tspc` command that ts-patch provides.
 - Patch the instance of typescript that's in your `node_modules` folder with the `ts-patch install` command and then use the `tsc` command to transpile your code.
+
 </details>
 
 <details>
@@ -86,19 +92,6 @@ npm i --save-dev ts-node
 
 </details>
 
-<details>
-    <summary>CLI Usage (esbuild, vite, watchers)</summary>
-
-If you want to use ts-macros with:
-
-- tools that don't support typescript
-- tools that aren't written in javascript and therefore cannot run typescript transformers (tools that use swc, for example)
-- any tools' watch mode (webpack, vite, esbuild, etc)
-
-you can use the CLI - [read more about the CLI and example here](https://github.com/GoogleFeud/ts-macros/wiki/CLI-usage)
-
-</details>
-
 ## Security
 
 This library has 2 built-in macros (`$raw` and `$comptime`) which execute arbitrary code during transpile time. The code is **not** sandboxed in any way and has access to your file system and all node modules.
@@ -121,4 +114,4 @@ TsMacros(program, { noComptime: true })
 
 ## Contributing
 
-`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at https://github.com/GoogleFeud/ts-macros.
+`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at <https://github.com/GoogleFeud/ts-macros>.
