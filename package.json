@@ -68,7 +68,7 @@
     "typescript",
     "macros"
   ],
-  "author": "snatvb & GoogleFeud",
+  "author": "snatvb and GoogleFeud",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/snatvb/ts-macros/issues"

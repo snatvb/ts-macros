@@ -117,4 +117,8 @@ TsMacros(program, { noComptime: true })
 
 ## Contributing
 
-`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at <https://github.com/GoogleFeud/ts-macros>.
+`ts-macros` is being maintained by a single person. Contributions are welcome and appreciated. Feel free to open an issue or create a pull request at <https://github.com/snatvb/ts-macros>.
+
+# Thanks
+
+This project is a fork of [ts-macros](https://github.com/GoogleFeud/ts-macros) by GoogleFeud. Thank you for the amazing foundation! 🚀
