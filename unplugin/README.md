@@ -1,6 +1,6 @@
 # unplugin-ts-macros
 
-[![NPM version](https://img.shields.io/npm/v/unplugin-starter?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-ts-macros)
+[![NPM version](https://img.shields.io/npm/v/unplugin-ts-macros?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-ts-macros)
 
 ## Install
 
