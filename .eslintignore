@@ -1,0 +1,5 @@
+tests/snapshots/artifacts/
+tests/integrated/
+dist/
+test/
+playground/
