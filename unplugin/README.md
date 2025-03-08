@@ -4,6 +4,8 @@
 
 ## Install
 
+WARN: It depends on `@snatvb/ts-macros`
+
 ```bash
 npm i unplugin-ts-macros
 ```
