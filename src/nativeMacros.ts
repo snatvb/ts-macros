@@ -1,7 +1,7 @@
-import * as ts from "typescript"
-import * as fs from "fs"
-import { MacroTransformer } from "./transformer"
-import * as path from "path"
+import ts from "typescript"
+import fs from "fs"
+import { MacroTransformer } from "./transformer.js"
+import path from "path"
 import {
   createNumberNode,
   expressionToStringLiteral,
@@ -13,7 +13,7 @@ import {
   normalizeFunctionNode,
   primitiveToNode,
   tryRun,
-} from "./utils"
+} from "./utils.js"
 
 const jsonFileCache: Record<string, ts.Expression> = {}
 const regFileCache: Record<string, string> = {}

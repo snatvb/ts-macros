@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import * as parseArgs from "yargs-parser"
-import * as ts from "typescript"
+import parseArgs from "yargs-parser"
+import ts from "typescript"
 import {
   PretranspileSettings,
   pretranspile,
   validateSettings,
-} from "./transform"
-import { cyan, emitError, emitNotification } from "./formatter"
+} from "./transform.js"
+import { cyan, emitError, emitNotification } from "./formatter.js"
 
 type CLIArgs = {
   _: string[]

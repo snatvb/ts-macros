@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as ts from "typescript"
-import { Macro, MacroExpand, MacroTransformer } from "./transformer"
+import ts from "typescript"
+import { Macro, MacroExpand, MacroTransformer } from "./transformer.js"
 
 export const macros = new Map<ts.Symbol, Macro>()
 
@@ -120,7 +120,7 @@ export declare function $$inline<F extends (...args: any) => any>(
  * @example
  * ```ts --Macro
  * import {$$kindof} from "ts-macros";
- * import * as ts from "typescript"
+ * import ts from "typescript"
  *
  * function $doSomethingBasedOnTypeOfParam(param: unknown) {
  *     if ($$kindof!(param) === ts.SyntaxKind.ArrayLiteralExpression) "Provided value is an array literal!";
@@ -480,7 +480,7 @@ export interface RawContext {
  *
  * @example
  * ```ts
- * import * as ts from "typescript";
+ * import ts from "typescript";
  * // raw version
  * function $addNumbers(...numbers: Array<number>) {
  *   return $$raw!((ctx: RawContext, numsAst: Array<ts.Expression>) => {
@@ -748,4 +748,4 @@ export interface VariableDeclarationLabel {
 
 export type Label = IfLabel | ForIterLabel | ForLabel | WhileLabel | BlockLabel
 
-export { MacroError } from "./utils"
+export { MacroError } from "./utils.js"

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as ts from "typescript"
-import nativeMacros from "./nativeMacros"
+import ts from "typescript"
+import nativeMacros from "./nativeMacros.js"
 import {
   wrapExpressions,
   toBinaryExp,
@@ -18,15 +18,15 @@ import {
   primitiveToNode,
   NO_LIT_FOUND,
   isMacroIdent,
-} from "./utils"
+} from "./utils.js"
 import {
   binaryActions,
   binaryNumberActions,
   unaryActions,
   labelActions,
   possiblyUnknownValueBinaryActions,
-} from "./actions"
-import { TsMacrosConfig } from "."
+} from "./actions.js"
+import { TsMacrosConfig } from "./index.js"
 
 export const enum MacroParamMarkers {
   None,

@@ -1,8 +1,8 @@
-import * as ts from "typescript"
-import * as path from "path"
-import * as childProcess from "child_process"
-import * as fs from "fs"
-import { MacroTransformer } from "../transformer"
+import ts from "typescript"
+import path from "path"
+import childProcess from "child_process"
+import fs from "fs"
+import { MacroTransformer } from "../transformer.js"
 import { TsMacrosConfig, macros } from "../index.js"
 import { createMacroTransformerWatcher } from "../watcher/index.js"
 

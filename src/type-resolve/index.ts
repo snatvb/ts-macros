@@ -1,10 +1,10 @@
-import * as ts from "typescript"
+import ts from "typescript"
 import type { ProgramTransformerExtras, PluginConfig } from "ts-patch"
-import { MacroTransformer } from "../transformer"
-import { TsMacrosConfig, macros } from "../index"
-import { transformDeclaration } from "./declarations"
-import { MacroError, genDiagnosticFromMacroError } from "../utils"
-import { generateChainingTypings } from "./chainingTypes"
+import { MacroTransformer } from "../transformer.js"
+import { TsMacrosConfig, macros } from "../index.js"
+import { transformDeclaration } from "./declarations.js"
+import { MacroError, genDiagnosticFromMacroError } from "../utils.js"
+import { generateChainingTypings } from "./chainingTypes.js"
 
 function printAsTS(
   printer: ts.Printer,

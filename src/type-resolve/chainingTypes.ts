@@ -1,7 +1,7 @@
-import * as ts from "typescript"
-import { Macro } from "../transformer"
-import { MapArray, hasBit } from "../utils"
-import { UNKNOWN_TOKEN } from "./declarations"
+import ts from "typescript"
+import { Macro } from "../transformer.js"
+import { MapArray, hasBit } from "../utils.js"
+import { UNKNOWN_TOKEN } from "./declarations.js"
 
 function resolveTypeName(
   checker: ts.TypeChecker,

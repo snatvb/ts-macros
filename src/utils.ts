@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as ts from "typescript"
-import { ComptimeFunction, MacroParam, MacroTransformer } from "./transformer"
+import ts from "typescript"
+import { ComptimeFunction, MacroParam, MacroTransformer } from "./transformer.js"
 
 export const NO_LIT_FOUND = Symbol("NO_LIT_FOUND")
 

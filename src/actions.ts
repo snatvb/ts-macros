@@ -1,11 +1,11 @@
-import * as ts from "typescript"
-import { LabelKinds } from "."
+import ts from "typescript"
+import { LabelKinds } from "./index.js"
 import {
   NO_LIT_FOUND,
   createNumberNode,
   createObjectLiteral,
   hasBit,
-} from "./utils"
+} from "./utils.js"
 
 export const binaryNumberActions: Record<
   number,

@@ -1,7 +1,7 @@
-import * as ts from "typescript"
-import { Macro, MacroTransformer } from "../transformer"
-import { TsMacrosConfig, macros } from ".."
-import { MacroError, MapArray, genDiagnosticFromMacroError } from "../utils"
+import ts from "typescript"
+import { Macro, MacroTransformer } from "../transformer.js"
+import { TsMacrosConfig, macros } from "../index.js"
+import { MacroError, MapArray, genDiagnosticFromMacroError } from "../utils.js"
 
 export enum FileUpdateCause {
   ContentChange,
