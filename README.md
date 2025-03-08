@@ -30,7 +30,7 @@ Read here: [`unplugin`](./unplugin)
 ### Other
 
 ```
-npm i --save-dev ts-macros
+npm i --save-dev @snatvb/ts-macros
 ```
 
 <details>
