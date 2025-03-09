@@ -27,9 +27,6 @@ importers:
       '@nuxt/schema':
         specifier: ^3.13.0
         version: 3.13.0(rollup@4.21.2)
-      '@snatvb/ts-macros':
-        specifier: ../
-        version: link:..
       '@types/node':
         specifier: ^22.5.1
         version: 22.5.1

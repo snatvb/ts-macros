@@ -1,9 +1,9 @@
 import type { UnpluginFactory } from "unplugin"
 import { createUnplugin } from "unplugin"
-import { Macro, MacroTransformer } from "@snatvb/ts-macros/transformer"
+import { Macro, MacroTransformer } from "../../src/transformer"
 import type { Options } from "./types"
 import ts from "typescript"
-import { TsMacrosConfig } from "@snatvb/ts-macros"
+import { TsMacrosConfig } from "../../src"
 
 const transformerConfig: TsMacrosConfig = {
   noComptime: false,

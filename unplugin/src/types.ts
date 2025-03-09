@@ -1,4 +1,4 @@
-import { TsMacrosConfig } from "@snatvb/ts-macros"
+import { TsMacrosConfig } from "../../src"
 
 export type Options = {
   tsconfig?: string
