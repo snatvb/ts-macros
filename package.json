@@ -1,6 +1,6 @@
 {
   "name": "@snatvb/ts-macros",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "description": "A typescript transformer / plugin which allows you to write macros for typescript!",
   "main": "dist/index.js",
   "bin": "dist/cli/index.js",
@@ -10,6 +10,7 @@
     "dev": "tsup --watch src",
     "lint": "npx eslint",
     "format": "prettier . --write",
+    "release": "bumpp && npm publish",
     "test": "tsc && cd ./tests && tspc && mocha dist/integrated/**/*.js && node ./dist/snapshots/index",
     "playground": "tsc && cd ./playground && npm run dev",
     "manual": "tsc && cd ./test && tspc",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
+    "bumpp": "^9.5.2",
     "@types/mocha": "^9.1.1",
     "@types/node": "^16.18.103",
     "@types/ts-expose-internals": "npm:ts-expose-internals@^5.6.2",
